@@ -1546,10 +1546,6 @@ void registerNetFnSenFunctions()
     initSensorMatches();
 #endif
 
-    // Register sensor list D-Bus interface for bmcweb to query IPMI sensor
-    // paths. busctl --verbose call xyz.openbmc_project.Ipmi.Host
-    // /xyz/openbmc_project/Ipmi xyz.openbmc_project.Ipmi.SensorList
-    // getSensorList ""
     registerSensorListInterface();
 
     // <Set Sensor Reading and Event Status>
