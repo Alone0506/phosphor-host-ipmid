@@ -551,7 +551,10 @@ std::string parseSdrIdFromPath(const std::string& path)
 #endif
 
         // as a backup and if nothing else is configured
-        name.resize(FULL_RECORD_ID_STR_MAX_LENGTH);
+        if (name.size() > FULL_RECORD_ID_STR_MAX_LENGTH)
+        {
+            name.resize(FULL_RECORD_ID_STR_MAX_LENGTH);
+        }
     }
     return name;
 }
@@ -2053,9 +2056,9 @@ void constructStaticSensorSdr(ipmi::Context::ptr, uint16_t sensorNum,
     {
         get_sdr::body::setIdStrLen(idString.length(), record.body);
     }
-    get_sdr::body::setIdType(3, &record.body); // "8-bit ASCII + Latin 1"
+    get_sdr::body::setIdType(3, record.body); // "8-bit ASCII + Latin 1"
     std::strncpy(record.body.idString, idString.c_str(),
-                 get_sdr::body::setIdStrLen(record.body));
+                 get_sdr::body::getIdStrLen(record.body));
 }
 #endif
 
