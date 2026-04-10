@@ -672,54 +672,57 @@ ipmi::RspType<uint8_t, // sensor reading
     }
 }
 
-void updateWarningThreshold(uint8_t lowerValue, uint8_t upperValue,
+void updateWarningThreshold(bool isLowerValueValid, uint8_t lowerValue,
+                            bool isUpperValueValid, uint8_t upperValue,
                             get_sdr::GetSensorThresholdsResponse& resp)
 {
     resp.lowerNonCritical = lowerValue;
     resp.upperNonCritical = upperValue;
-    if (lowerValue)
+    if (isLowerValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::NON_CRITICAL_LOW_MASK);
     }
 
-    if (upperValue)
+    if (isUpperValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::NON_CRITICAL_HIGH_MASK);
     }
 }
 
-void updateCriticalThreshold(uint8_t lowerValue, uint8_t upperValue,
+void updateCriticalThreshold(bool isLowerValueValid, uint8_t lowerValue,
+                             bool isUpperValueValid, uint8_t upperValue,
                              get_sdr::GetSensorThresholdsResponse& resp)
 {
     resp.lowerCritical = lowerValue;
     resp.upperCritical = upperValue;
-    if (lowerValue)
+    if (isLowerValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::CRITICAL_LOW_MASK);
     }
 
-    if (upperValue)
+    if (isUpperValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::CRITICAL_HIGH_MASK);
     }
 }
 
-void updateNonRecoverableThreshold(uint8_t lowerValue, uint8_t upperValue,
+void updateNonRecoverableThreshold(bool isLowerValueValid, uint8_t lowerValue,
+                                   bool isUpperValueValid, uint8_t upperValue,
                                    get_sdr::GetSensorThresholdsResponse& resp)
 {
     resp.lowerNonRecoverable = lowerValue;
     resp.upperNonRecoverable = upperValue;
-    if (lowerValue)
+    if (isLowerValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::NON_RECOVERABLE_LOW_MASK);
     }
 
-    if (upperValue)
+    if (isUpperValueValid)
     {
         resp.validMask |= static_cast<uint8_t>(
             ipmi::sensor::ThresholdMask::NON_RECOVERABLE_HIGH_MASK);
@@ -772,17 +775,23 @@ void updateThresholds(
             static_cast<uint8_t>(std::clamp(rawData, minClamp, maxClamp));
     }
 
+    bool isLowerValueValid = std::isfinite(lowValue);
+    bool isUpperValueValid = std::isfinite(highValue);
+
     if (thresholdName == "Warning")
     {
-        updateWarningThreshold(lowerValue, upperValue, resp);
+        updateWarningThreshold(isLowerValueValid, lowerValue, isUpperValueValid,
+                               upperValue, resp);
     }
     else if (thresholdName == "Critical")
     {
-        updateCriticalThreshold(lowerValue, upperValue, resp);
+        updateCriticalThreshold(isLowerValueValid, lowerValue,
+                                isUpperValueValid, upperValue, resp);
     }
     else if (thresholdName == "NonRecoverable")
     {
-        updateNonRecoverableThreshold(lowerValue, upperValue, resp);
+        updateNonRecoverableThreshold(isLowerValueValid, lowerValue,
+                                      isUpperValueValid, upperValue, resp);
     }
 }
 
