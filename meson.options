@@ -62,7 +62,7 @@ option(
 option(
     'system-sensor',
     type: 'string',
-    value: '/xyz/openbmc_project/inventory/system',
+    value: '/xyz/openbmc_project/inventory/system/selClear',
     description: 'The inventory path to the system event sensor',
 )
 
