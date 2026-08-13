@@ -273,8 +273,6 @@ GetSensorResponse readingData(const Info& sensorInfo)
         return response;
     }
 
-    int32_t rawData =
-        (value - sensorInfo.scaledOffset) / sensorInfo.coefficientM;
     constexpr uint8_t reserved_bits_7_6 = 0xC0; // bits[7:6] = 11b (reserved)
     constexpr uint8_t sensorUnitsSignedBits = 2 << 6;
     constexpr uint8_t signedDataFormat = 0x80;
@@ -291,12 +289,19 @@ GetSensorResponse readingData(const Info& sensorInfo)
         minClamp = std::numeric_limits<uint8_t>::lowest();
         maxClamp = std::numeric_limits<uint8_t>::max();
     }
-    setReading(static_cast<uint8_t>(std::clamp(rawData, minClamp, maxClamp)),
-               response);
 
     if (!std::isfinite(value))
     {
+        response.reading = 0;
         response.readingOrStateUnavailable = 1;
+    }
+    else
+    {
+        int32_t rawData =
+            (value - sensorInfo.scaledOffset) / sensorInfo.coefficientM;
+        setReading(
+            static_cast<uint8_t>(std::clamp(rawData, minClamp, maxClamp)),
+            response);
     }
 
     bool critAlarmHigh;
